@@ -112,14 +112,24 @@ def by_subregion():
     result = {}
 
     for uni in data:
-        region = uni.get("subregion")
+        subregion = uni.get("subregion")
 
-        if region not in result:
-            result[region] = 0
+        if not subregion:
+            continue
 
-        result[region] += 1
+        result[subregion] = result.get(subregion, 0) + 1
 
-    return result
+    return sorted(
+        [
+            {
+                "subregion": subregion,
+                "count": count
+            }
+            for subregion, count in result.items()
+        ],
+        key=lambda x: x["count"],
+        reverse=True
+    )
 
 @router.get("/country-average-score")
 def country_average_score():
