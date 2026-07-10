@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { MOCK_UNIVERSITIES, University } from "../data";
+import { University } from "../data";
+import { useUniversityData } from "./data/UniversityDataProvider";
 import { X, LayoutGrid } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -84,6 +85,7 @@ const ProfessionalInput = ({
 );
 
 export default function ComparisonMatrix() {
+  const { universities } = useUniversityData();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [criteria, setCriteria] = useState<Criteria>(DEFAULT_CRITERIA);
   const [hasSearched, setHasSearched] = useState(false);
@@ -99,7 +101,7 @@ export default function ComparisonMatrix() {
   const searchResults = useMemo(() => {
     if (!hasSearched) return [];
     
-    const results = MOCK_UNIVERSITIES.map(u => {
+      const results = universities.map(u => {
       const e = ENRICHMENT[u.id] ?? DEFAULT_ENRICH;
       let score = 100;
 
@@ -119,11 +121,11 @@ export default function ComparisonMatrix() {
     return results
       .filter(r => (maxTuition === null && minSalary === null && maxRank === null && maxLiving === null && maxAcceptance === null && minScholarship === null && !reqAccred) || r.score > 0)
       .sort((a, b) => b.score - a.score);
-  }, [hasSearched, criteria, maxTuition, maxLiving, minSalary, maxRank, maxAcceptance, minScholarship, reqAccred]);
+  }, [hasSearched, criteria, maxTuition, maxLiving, minSalary, maxRank, maxAcceptance, minScholarship, reqAccred, universities]);
 
   const displayedUnis = useMemo(() => {
-    return selectedIds.map(id => MOCK_UNIVERSITIES.find(u => u.id === id)).filter(Boolean) as University[];
-  }, [selectedIds]);
+    return selectedIds.map(id => universities.find(u => u.id === id)).filter(Boolean) as University[];
+  }, [selectedIds, universities]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
