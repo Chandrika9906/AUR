@@ -5,7 +5,7 @@ from routers import membership
 from routers import faculty_student_awards
 
 
-from database.connections import close_db, close_redis
+from database.connections import close_db, close_redis, init_db
 from routers import universities, rankings, countries, search
 from routers.auth import router as auth_router
 from routers.users import router as users_router
@@ -18,10 +18,11 @@ from routers import news
 from routers import methodology
 from routers import events
 from routers import notifications
-from routers import blogs
+# Blog router is temporarily disabled until its request/response schemas are added.
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await init_db()
     yield
     await close_db()
     await close_redis()
@@ -59,7 +60,7 @@ app.include_router(events.router)
 app.include_router(notifications.router)
 app.include_router(membership.router)
 app.include_router(faculty_student_awards.router)
-app.include_router(blogs.router)
+# app.include_router(blogs.router)
 
 @app.get("/")
 def root():
