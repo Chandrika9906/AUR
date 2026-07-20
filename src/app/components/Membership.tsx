@@ -692,7 +692,7 @@ export default function Membership() {
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+            whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(127, 86, 217, 0.25)" }}
             className="bg-[var(--aur-text)] border border-[var(--aur-text)] rounded-3xl p-8 shadow-xl flex flex-col relative text-[var(--background)] transition-transform"
           >
             <div className="absolute top-0 right-8 transform -translate-y-1/2">
@@ -732,7 +732,7 @@ export default function Membership() {
             <button
               onClick={() => openApplication("Premium Institution", premiumTier)}
               disabled={tiersLoading || !premiumTier}
-              className="w-full py-4 px-6 rounded-xl bg-[var(--background)] hover:opacity-90 text-[var(--aur-text)] font-bold text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)] dark:shadow-[0_0_20px_rgba(0,0,0,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 px-6 rounded-xl bg-[var(--background)] hover:opacity-90 text-[var(--aur-text)] font-bold text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)] dark:shadow-[0_0_20px_rgba(127, 86, 217, 0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {tiersLoading ? "Loading..." : "Apply for Premium"}
             </button>
@@ -754,3 +754,4 @@ export default function Membership() {
     </div>
   );
 }
+

@@ -227,7 +227,7 @@ export default function Login() {
         <div className="absolute inset-0 z-0 overflow-hidden">
           <CanvasRevealEffect
             animationSpeed={3}
-            containerClassName="bg-black"
+            containerClassName="bg-cyber-black"
             colors={[
               [255, 255, 255],
               [255, 255, 255],
@@ -237,11 +237,11 @@ export default function Login() {
             showGradient={false}
           />
           {/* Radial vignette so center stays dark and readable */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.85)_0%,_transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(127, 86, 217, 0.85)_0%,_transparent_70%)]" />
           {/* Top fade */}
-          <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-black to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-cyber-black to-transparent" />
           {/* Bottom fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-black to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-cyber-black to-transparent" />
         </div>
       <div className="lp-bg-grid relative z-10"/>
 
@@ -492,3 +492,5 @@ export default function Login() {
     </div>
   );
 }
+
+
