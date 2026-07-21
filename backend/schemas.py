@@ -282,3 +282,43 @@ class NotificationResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# --- Blog Schemas ---
+class BlogBase(BaseModel):
+    title: str
+    category: str
+    status: str = "Draft"
+    description: str
+    content: str
+    cover_image: Optional[str] = None
+    author: Optional[str] = None
+    read_time: Optional[str] = None
+    tags: Optional[str] = None
+    featured: bool = False
+    publish_date: Optional[datetime] = None
+
+class BlogCreate(BlogBase):
+    slug: Optional[str] = None
+
+class BlogUpdate(BaseModel):
+    title: Optional[str] = None
+    category: Optional[str] = None
+    status: Optional[str] = None
+    description: Optional[str] = None
+    content: Optional[str] = None
+    cover_image: Optional[str] = None
+    author: Optional[str] = None
+    read_time: Optional[str] = None
+    tags: Optional[str] = None
+    featured: Optional[bool] = None
+    publish_date: Optional[datetime] = None
+    slug: Optional[str] = None
+
+class BlogResponse(BlogBase):
+    id: UUID
+    slug: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
