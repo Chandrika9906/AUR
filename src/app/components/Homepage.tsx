@@ -497,7 +497,12 @@ export default function Homepage({
     "/university_images/China/Tsinghua University image.jpg",
     "/university_images/Singapore/National University of Singapore image.jpg",
     "/university_images/Hong-kong/The University of Hong Kong image.jpg",
-    "/university_images/South-Korea/KAIST image.jpg"
+    "/university_images/South-Korea/KAIST image.jpg",
+    "/hero/hero_new_1.png",
+    "/hero/hero_new_2.jpg",
+    "/hero/hero_new_3.png",
+    "/hero/hero_new_4.png",
+    "/hero/hero_new_5.jpg"
   ], []);
   const [currentHeroBg, setCurrentHeroBg] = useState(0);
 
@@ -717,10 +722,10 @@ export default function Homepage({
               Explore Rankings
               <ArrowRight className="h-4 w-4 ml-2 inline" />
             </button>
-            <button type="button" className="bg-transparent border-2 border-[#1A365D] text-[#1A365D] hover:bg-slate-50 font-bold rounded-lg px-8 py-3.5 text-sm transition-colors" onClick={() => onViewChange("methodology")}>
+            {/* <button type="button" className="bg-transparent border-2 border-[#1A365D] text-[#1A365D] hover:bg-slate-50 font-bold rounded-lg px-8 py-3.5 text-sm transition-colors" onClick={() => onViewChange("methodology")}>
               <BookOpen className="h-4 w-4 mr-2 inline" />
               Our Methodology
-            </button>
+            </button> */}
           </div>
 
           {/* Search */}
@@ -1082,13 +1087,13 @@ export default function Homepage({
                     aria-label={social.label}
                     className="group"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 hover:bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 hover:bg-white transition-colors duration-200">
                       <Image
                         src={social.imgSrc}
                         alt={social.label}
                         width={18}
                         height={18}
-                        className="object-contain filter brightness-0 invert group-hover:filter-none group-hover:brightness-100 transition-all duration-300"
+                        className="object-contain"
                       />
                     </div>
                   </a>
@@ -1098,7 +1103,7 @@ export default function Homepage({
 
             {[
               { title: "Platform", links: [["Rankings Engine", "rankings"], ["Discovery Hub", "home"], ["Analytics", "analytics"], ["Compare Institutions", "home"]] },
-              { title: "Resources", links: [["Methodology", "methodology"], ["Reports", "home"], ["Insights", "home"], ["News & Updates", "home"]] },
+              { title: "Resources", links: [["Reports", "home"], ["Insights", "home"], ["News & Updates", "home"]] },
               { title: "Company", links: [["About Us", "home"], ["Careers", "home"], ["Contact", "settings"], ["Privacy Policy", "settings"]] },
             ].map((col) => (
               <div key={col.title}>
@@ -1109,7 +1114,7 @@ export default function Homepage({
                       <button
                         type="button"
                         onClick={() => onViewChange(view)}
-                        className="text-sm text-blue-100/70 hover:text-white hover:translate-x-1 transition-all flex items-center gap-2"
+                        className="text-sm text-left justify-start text-blue-100/70 hover:text-white hover:translate-x-1 transition-all flex items-center gap-2 w-full"
                       >
                         {label}
                       </button>
