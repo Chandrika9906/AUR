@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 /**
@@ -15,7 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
  *  2. Persists them exactly the same way the email/password Login does
  *  3. Redirects to the home view
  */
-export default function OAuthSuccess() {
+function OAuthSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"processing" | "error">("processing");
@@ -163,5 +163,13 @@ export default function OAuthSuccess() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function OAuthSuccess() {
+  return (
+    <Suspense fallback={null}>
+      <OAuthSuccessContent />
+    </Suspense>
   );
 }

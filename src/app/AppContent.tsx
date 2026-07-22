@@ -22,7 +22,6 @@ import Methodology from "./components/Methodology";
 import EventsAndAwards from "./components/EventsAndAwards";
 import FacultyStudentAwards from "./components/FacultyStudentAwards";
 import Membership from "./components/Membership";
-import BlogForm from "./components/blog/BlogForm";
 import { useSidebar } from "./components/navigation/SidebarContext";
 import { useUniversityData } from "./components/data/UniversityDataProvider";
 import { Article, MOCK_UNIVERSITIES } from "./data";
@@ -319,8 +318,6 @@ useEffect(() => {
           )}
 
 
-          {activeView === "create-blog" && <BlogForm />}
-      
           {activeView === "university-profile" && selectedUniId && (
             <UniversityProfile 
               universityId={selectedUniId} 
