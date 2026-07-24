@@ -184,9 +184,8 @@ useEffect(() => {
 };
 
   const handleUniversitySelect = (uniId: string) => {
-    setSelectedUniId(uniId);
-    handleViewChange("university-profile");
-  };
+  setSelectedUniId(uniId);
+};
 
   const handleBackToRankings = () => {
     setSelectedUniId(null);

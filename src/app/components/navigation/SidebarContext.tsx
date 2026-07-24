@@ -62,6 +62,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUniIds, setSelectedUniIds] = useState<string[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [previousView, setPreviousView] = useState<string>("rankings");
 
   // Read localStorage for isCollapsed and theme (safe for SSR)
   useEffect(() => {
@@ -147,7 +148,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const handleViewChange = (view: string) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
     current.set("view", view);
-    if (view !== "profile") {
+    if (view !== "university-profile") {
       current.delete("id");
     }
     
@@ -161,16 +162,17 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const setSelectedUniId = (id: string | null) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    if (id) {
-      current.set("view", "profile");
-      current.set("id", id);
-    } else {
-      current.set("view", "rankings");
-      current.delete("id");
-    }
-    router.push(`?${current.toString()}`);
-  };
+  const current = new URLSearchParams(Array.from(searchParams.entries()));
+  if (id) {
+    setPreviousView(activeView);
+    current.set("view", "university-profile");
+    current.set("id", id);
+  } else {
+    current.set("view", previousView);
+    current.delete("id");
+  }
+  router.push(`?${current.toString()}`);
+};
 
   return (
     <SidebarContext.Provider
