@@ -228,6 +228,35 @@ class FinalScoreResponse(BaseModel):
     judges_count: int
 
 
+class MembershipTierResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    name: str
+    price: float
+    duration_months: int
+    benefits: List[str]
+
+
+class MembershipSubscribeRequest(BaseModel):
+    tier_id: uuid.UUID
+    university_name: str
+    country: str
+    website_url: str
+    contact_name: str
+    job_title: str
+    contact_email: str
+    card_number: str
+    expiry: str
+    cvv: str
+
+
+class UserMembershipResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    tier: MembershipTierResponse
+    start_date: datetime
+    end_date: datetime
+    status: str
 
 class NominationCreate(BaseModel):
     nominee_name: str
@@ -303,3 +332,30 @@ class BlogResponse(BlogBase):
 
     class Config:
         from_attributes = True
+
+class AdminLoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class AdminLoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class AdminVerifyResponse(BaseModel):
+    id: UUID
+    first_name: str
+    last_name: str
+    email: EmailStr
+    role: str
+
+    class Config:
+        from_attributes = True        
+
+class UniversityRegisterRequest(BaseModel):
+    name: str
+    registration_code: str
+    ranking_score: float
+    description: str     

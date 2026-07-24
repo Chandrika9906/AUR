@@ -1,7 +1,20 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
+/**
+ * /oauth/success
+ *
+ * The backend redirects here after a successful Google OAuth login:
+ *   https://aur-38ce.onrender.com/auth/google/callback
+ *     → 302 → https://aur-tau.vercel.app/oauth/success?access_token=...&refresh_token=...
+ *
+ * This page:
+ *  1. Reads the tokens from the URL
+ *  2. Persists them exactly the same way the email/password Login does
+ *  3. Redirects to the home view
+ */
 
 function OAuthSuccessContent() {
   const router = useRouter();
@@ -125,7 +138,7 @@ function OAuthSuccessContent() {
             fontSize: "1.5rem",
           }}
         >
-          ✕
+          &times;
         </div>
         <h2 style={{ color: "#f9fafb", fontSize: "1.1rem", margin: "0 0 0.5rem" }}>
           Authentication Failed

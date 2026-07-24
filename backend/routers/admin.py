@@ -13,13 +13,22 @@ from sqlalchemy import select, func
 from database.connections import get_db, get_redis
 from database.models import User, University, RankingScore, UniversityMetric
 from auth.middleware import require_admin
+from auth.middleware import get_current_user
 import redis.asyncio as aioredis
 from pathlib import Path
 from datetime import datetime
+from sqlalchemy import select
+from database.models import User, University, RankingScore
+from schemas import UniversityRegisterRequest
+from database.connections import get_db
+from fastapi import Depends, HTTPException
 import shutil
 import subprocess
 import sys
 import json
+import bcrypt
+from services.cloudinary import upload_university_logo, upload_campus_photo
+from uuid import UUID as PyUUID
 
 from database.models import (
     Event,
@@ -30,6 +39,9 @@ from database.models import (
 from schemas import (
     EventCreate,
     EventResponse,
+    AdminLoginRequest,
+    AdminLoginResponse,
+    AdminVerifyResponse,
 )
 
 from typing import List
@@ -46,6 +58,11 @@ from schemas import (
     FinalScoreResponse,
 )
 
+from auth.jwt import (
+    create_access_token,
+    create_refresh_token,
+)
+
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -57,6 +74,52 @@ PUBLISH_FILE = DATA_DIR / "publish.json"
 
 ALLOWED = {".csv", ".xlsx", ".xls"}
 
+@router.post("/login", response_model=AdminLoginResponse)
+async def admin_login(
+    body: AdminLoginRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(User).where(User.email == body.email)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user or not bcrypt.checkpw(
+        body.password.encode(),
+        user.password_hash.encode()
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password",
+        )
+
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access only",
+        )
+
+    access_token = create_access_token(
+        {"sub": str(user.id), "role": user.role}
+    )
+    refresh_token = await create_refresh_token(user.id)
+
+    return AdminLoginResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+    )
+
+@router.get("/verify", response_model=AdminVerifyResponse)
+async def verify_admin(
+    current_admin: User = Depends(require_admin),
+):
+    return AdminVerifyResponse(
+        id=current_admin.id,
+        first_name=current_admin.first_name,
+        last_name=current_admin.last_name,
+        email=current_admin.email,
+        role=current_admin.role,
+    )
 
 @router.post("/upload")
 async def upload_dataset(
@@ -747,3 +810,120 @@ async def events_dashboard(
         "winners": winners,
         "rejected": rejected,
     }
+
+@router.post("/university/register", status_code=201)
+async def register_university(
+    payload: UniversityRegisterRequest,
+    current_admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    # Check if university already exists
+    existing = await db.execute(
+        select(University).where(
+            University.name == payload.name
+        )
+    )
+
+    if existing.scalar_one_or_none():
+        raise HTTPException(
+            status_code=400,
+            detail="University already exists"
+        )
+
+    # Generate slug
+    slug = payload.name.lower().replace(" ", "-")
+
+    # Create University
+    university = University(
+        slug=slug,
+        name=payload.name,
+        country="Unknown",
+        description=payload.description,
+    )
+
+    db.add(university)
+    await db.commit()
+    await db.refresh(university)
+
+    # Store ranking score
+    ranking = RankingScore(
+        university_id=university.id,
+        year=datetime.now().year,
+        overall_score=payload.ranking_score,
+    )
+
+    db.add(ranking)
+    await db.commit()
+
+    return {
+        "status": "success",
+        "message": "University registered successfully",
+        "university_id": str(university.id),
+    }
+# Image upload endpoints
+
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/svg+xml"}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+ 
+ 
+@router.post("/universities/{university_id}/logo", tags=["admin", "images"])
+async def upload_logo(
+    university_id: PyUUID,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
+):
+
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type: {file.content_type}. Use JPEG, PNG, WebP, or SVG.")
+ 
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Max size is 5MB.")
+ 
+    result = await db.execute(select(University).where(University.id == university_id))
+    uni = result.scalar_one_or_none()
+    if not uni:
+        raise HTTPException(status_code=404, detail="University not found.")
+ 
+    try:
+        url = upload_university_logo(contents, uni.slug, file.filename or uni.slug)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Cloudinary upload failed: {str(e)}")
+ 
+    uni.logo_url = url
+    await db.commit()
+ 
+    return {"university_id": str(university_id), "logo_url": url}
+ 
+ 
+@router.post("/universities/{university_id}/campus-photo", tags=["admin", "images"])
+async def upload_campus_photo_endpoint(
+    university_id: PyUUID,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
+):
+
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type: {file.content_type}.")
+ 
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Max size is 5MB.")
+ 
+    result = await db.execute(select(University).where(University.id == university_id))
+    uni = result.scalar_one_or_none()
+    if not uni:
+        raise HTTPException(status_code=404, detail="University not found.")
+ 
+    try:
+        url = upload_campus_photo(contents, uni.slug)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Cloudinary upload failed: {str(e)}")
+ 
+    uni.campus_photo = url
+    await db.commit()
+ 
+    return {"university_id": str(university_id), "campus_photo_url": url}
+

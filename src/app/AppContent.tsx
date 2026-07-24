@@ -135,7 +135,7 @@ useEffect(() => {
 }, [uniDirectory, universities]);
   // Derived state from URL (synced with context)
   const view = !isAuthenticated && activeView !== "home" && activeView !== "login"
-    ? "home"
+    ? "login"
     : activeView;
   const id = selectedUniId;
 
@@ -184,9 +184,8 @@ useEffect(() => {
 };
 
   const handleUniversitySelect = (uniId: string) => {
-    setSelectedUniId(uniId);
-    handleViewChange("university-profile");
-  };
+  setSelectedUniId(uniId);
+};
 
   const handleBackToRankings = () => {
     setSelectedUniId(null);
@@ -212,7 +211,7 @@ useEffect(() => {
 
   useEffect(() => {
     if (authReady && !isAuthenticated && activeView !== "home" && activeView !== "login") {
-      router.replace("?view=home");
+      router.replace("?view=login&mode=login");
     }
   }, [activeView, authReady, isAuthenticated, router]);
 
@@ -279,6 +278,7 @@ useEffect(() => {
               onUniversitySelect={handleUniversitySelect}
               onArticleSelect={handleArticleSelect}
               onViewChange={handleViewChange}
+              isAuthenticated={isAuthenticated}
             />
           )}
 
@@ -299,8 +299,6 @@ useEffect(() => {
           )}
 
 
-          {activeView === "create-blog" && <BlogForm />}
-      
           {activeView === "university-profile" && selectedUniId && (
             <UniversityProfile 
               universityId={selectedUniId} 
